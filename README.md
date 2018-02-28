@@ -1,5 +1,5 @@
 # IDA GCC RTTI
----
+
 ##### This is Class informer plugin for Interactive Disassembler (IDA) which parses GCC RTTI
 
 ### Features
