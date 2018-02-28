@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2024
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gcc_rtti", "gcc_rtti\gcc_rtti.vcxproj", "{1C76E780-917D-45FF-852B-F007D47D4972}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|IDA32 = Debug|IDA32
+		Debug|IDA64 = Debug|IDA64
+		Release|IDA32 = Release|IDA32
+		Release|IDA64 = Release|IDA64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug|IDA32.ActiveCfg = Debug - IDA32|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug|IDA32.Build.0 = Debug - IDA32|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug|IDA64.ActiveCfg = Debug - IDA64|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug|IDA64.Build.0 = Debug - IDA64|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Release|IDA32.ActiveCfg = Release - IDA32|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Release|IDA32.Build.0 = Release - IDA32|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Release|IDA64.ActiveCfg = Release - IDA64|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Release|IDA64.Build.0 = Release - IDA64|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {673B68F5-55B1-40D3-B215-3B6C6033F4EF}
+	EndGlobalSection
+EndGlobal
