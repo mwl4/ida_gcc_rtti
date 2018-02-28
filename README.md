@@ -32,7 +32,7 @@ Also do not forget to use ignored prefixes feature, since you rather do not need
 * IDA SDK (`idasdk`) - supported versions: 6.6 (`ida_older_than_70` branch), 6.8  (`ida_older_than_70` branch), 7.0 (`master` branch), and probably also older/newer versions
 
 ##### Building:
-1. Put `idasdk` into `/src/libs/idasdk`, so there will be `/src/libs/idasdk/include` and `/src/libs/idasdk/lib/`
+1. Put `idasdk` into `/src/libs/`, so there will be `/src/libs/idasdk/include/` and `/src/libs/idasdk/lib/`
 2. Open `src/ida_gcc_rtti.sln` in Visual Studio
 3. Set proper Solution Configuration (`Release`), and proper Solution Platform (`IDA32` or `IDA64` - depends on what you need)
 4. Build solution.
