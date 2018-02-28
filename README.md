@@ -19,8 +19,11 @@ Load your binary to IDA, wait for the end of analysis, and if plugin was loaded 
 
 ### Graphs
 It is a little problem to deal with for example 5000 classes in one graph. I have not found any software, which could render it properly, so I think the best approach, which I was using is to use Graphviz (https://www.graphviz.org) tools to convert `.dot` format to `.svg`. Then you can load .svg file into Google Chrome or any web browser, which certainly will handle it well (do not forget to disable all plugins in web browser which try to help with manipulating svg file, however they seem to be working very slowly with that amount of data).
+
 You can easily convert `.dot` format to `.svg` using following command:
+
 ``bin\dot.exe -Tsvg classes.dot -o classes.svg``
+
 Also do not forget to use ignored prefixes feature, since you rather do not need libraries classes in graph (it makes only a mess).
 
 ### Compilation
@@ -40,10 +43,12 @@ Feel free to adjust code and linking to make it possible. I do not need it, so I
 
 ### Original GCC RTTI parsing scripts
 I wrote this plugin basing on already existing python scripts, which also handle parsing RTTI. However they perform parsing tasks very very slow, they seem to be not optimized well, that is why handling few thousand classes in some binary might take even few days. If you do not have time like me to wait few days, then use this plugin to make it a lot faster. Also I added some extra stuff to it and it has few fixes comparing to original scripts.
+
 Original scripts I was basing on:
 * http://www.hexblog.com/?p=704 - By Igor Skochinsky
 * https://github.com/nccgroup/PythonClassInformer - By NCC Group
 
 ### License
 This software is released under three-clause BSD License.
+
 Copyright © 2018, Michał Wójtowicz a.k.a. mwl4
