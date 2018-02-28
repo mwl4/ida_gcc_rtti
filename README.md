@@ -12,7 +12,7 @@
 * Handling anonymous names
 
 ### Installation
-Download compiled plugin in proper version, i.e. (`bin/ida_ver_x_x.xxxxxx/gcc_rtti.plw` & `*.p64`), then put `.plw` and `.p64` files in `/plugins` directory in IDA. 
+Download compiled plugin in proper version, i.e. (`bin/ida_ver_x_x.xxxxxx/gcc_rtti.plw` and `*.p64` or `.dll`), then put `.plw` and `.p64` or `.dll` files in `/plugins` directory in IDA.
 
 ### Usage
 Load your binary to IDA, wait for the end of analysis, and if plugin was loaded successfully you should have `Class Informer - GCC RTTI` in `Edit` -> `Plugins` toolbar. 

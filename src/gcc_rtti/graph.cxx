@@ -19,7 +19,7 @@
 void graph_t::run()
 {
 	const string question = "Do you want to generate graph?\n";
-	const int answer = askbuttons_c("Yes", "No", "Cancel", ASKBTN_YES, question);
+	const int answer = ask_buttons("Yes", "No", "Cancel", ASKBTN_YES, question);
 
 	if (answer != ASKBTN_YES)
 	{
@@ -33,7 +33,7 @@ void graph_t::run()
 
 	process_ignored_prefixes();
 
-	const string filepath = askfile2_c(true, "", "*.dot", "Choose file to which save the graph...");
+	const string filepath = ask_file(true, "", "*.dot", "Choose file to which save the graph...");
 
 	if (!filepath)
 	{
@@ -48,14 +48,14 @@ bool graph_t::fill_ignored_prefixes()
 	const string default_value = "std\ntype_info";
 	const string question = "List of ignored prefixes:";
 
-	char ignore_namespaces_buffer[2048] = { 0 };
-	if (!asktext(sizeof(ignore_namespaces_buffer), ignore_namespaces_buffer, default_value, question))
+	qstring ignore_namespaces_buffer;
+	if (!ask_text(&ignore_namespaces_buffer, 2048, default_value, question))
 	{
 		return false;
 	}
 
 	sstring_t current;
-	for (char *c = ignore_namespaces_buffer; *c; ++c)
+	for (const char *c = ignore_namespaces_buffer.c_str(); *c; ++c)
 	{
 		if (*c == '\n' || *(c + 1) == '\0')
 		{

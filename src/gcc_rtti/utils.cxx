@@ -22,9 +22,13 @@ namespace utils
 {
 	sstring_t get_segment_name(ea_t address)
 	{
-		char segment_name[128] = { 0 };
-		get_segm_name(address, segment_name, sizeof(segment_name));
-		return segment_name;
+		if (segment_t *const seg = getseg(address))
+		{
+			qstring segname;
+			get_visible_segm_name(&segname, seg);
+			return segname;
+		}
+		return sstring_t();
 	}
 
 	xreferences_t get_xrefs(ea_t ea, int flags)
@@ -45,12 +49,12 @@ namespace utils
 	{
 		xreferences_t found;
 
-		for (ea_t startAddress = inf.minEA, current = 0;; startAddress = current + sizeof(ea_t))
+		for (ea_t startAddress = inf.min_ea, current = 0;; startAddress = current + sizeof(ea_t))
 		{
 			const ea_t mask = ALL_BYTES_EA_MASK;
 			current = bin_search
 			(
-				startAddress, inf.maxEA,
+				startAddress, inf.max_ea,
 				reinterpret_cast<const uchar *>(&address),
 				reinterpret_cast<const uchar *>(&mask),
 				sizeof(ea_t),
@@ -58,7 +62,7 @@ namespace utils
 			);
 			if (current != BADADDR)
 			{
-				found.push_back(xreference_t(current, isCode(getFlags(current))));
+				found.push_back(xreference_t(current, is_code(get_flags(current))));
 			}
 			else
 			{
@@ -95,10 +99,10 @@ namespace utils
 		size_t n = get_strlist_qty();
 		for (size_t i = 0; i < n; ++i)
 		{
-			get_strlist_item(i, &info);
+			get_strlist_item(&info, i);
 			size_t buffer_size = info.length + 1;
 			char *buffer = new char[buffer_size];
-			get_many_bytes(info.ea, buffer, info.length);
+			get_bytes(buffer, info.length, info.ea, GMB_READALL);
 			buffer[info.length] = '\0';
 			result.push_back(string_data_t(info.ea, buffer));
 			delete[] buffer;
@@ -141,12 +145,12 @@ namespace utils
 	void force_ptr(const ea_t address, size_t delta/* = 0 */)
 	{
 	#ifdef __EA64__
-		doQwrd(address, 8);
+		create_qword(address, 8);
 	#else
-		doDwrd(address, 4);
+		create_dword(address, 4);
 	#endif
 
-		if (isOff0(getFlags(address)))
+		if (is_off0(get_flags(address)))
 		{
 			return; // don't touch fixups
 		}
@@ -159,7 +163,10 @@ namespace utils
 			{
 				delta = 0;
 			}
-			op_stroff(address, 0, nullptr, 0, delta);
+
+			insn_t instruction;
+			create_insn(address, &instruction);
+			op_stroff(instruction, 0, nullptr, 0, delta);
 		}
 	}
 

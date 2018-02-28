@@ -62,11 +62,11 @@ void gcc_rtti_t::run()
 	m_current_class_id = 0;
 
 	// initialize code data
-	m_code.resize(static_cast<size_t>(inf.maxEA - inf.minEA));
-	get_many_bytes(inf.minEA, &m_code[0], m_code.size());
+	m_code.resize(static_cast<size_t>(inf.max_ea - inf.min_ea));
+	get_bytes(&m_code[0], m_code.size(), inf.min_ea, GMB_READALL);
 
 	const string question = "Do you want to make auxiliary vtables names (+ptr_size offset)?\n";
-	const int answer = askbuttons_c("Yes", "No", "Cancel", ASKBTN_NO, question);
+	const int answer = ask_buttons("Yes", "No", "Cancel", ASKBTN_NO, question);
 
 	if (answer == ASKBTN_CANCEL) { return; }
 
@@ -178,9 +178,9 @@ void gcc_rtti_t::handle_classes(ti_types_t idx, ea_t(gcc_rtti_t::*const formatte
 
 		for (size_t current = 0; current < m_code.size(); current += sizeof(ea_t))
 		{
-			if (*reinterpret_cast<ea_t *>(&m_code[current]) == address && !isCode(getFlags(inf.minEA + current)))
+			if (*reinterpret_cast<ea_t *>(&m_code[current]) == address && !is_code(get_flags(inf.min_ea + current)))
 			{
-				xrefs.push_back(utils::xreference_t(inf.minEA + current, false));
+				xrefs.push_back(utils::xreference_t(inf.min_ea + current, false));
 			}
 		}
 
@@ -224,19 +224,18 @@ ea_t gcc_rtti_t::format_type_info(const ea_t address)
 
 	// looks good, let's do it
 	const ea_t address2 = format_struct(address, "vp");
-	do_name_anyway(tis, (sstring_t("__ZTS") + proper_name).c_str(), 1024);
-	do_name_anyway(address, (sstring_t("__ZTI") + proper_name).c_str(), 1024);
+	set_name(tis, (sstring_t("__ZTS") + proper_name).c_str());
+	set_name(address, (sstring_t("__ZTI") + proper_name).c_str());
 
-	char demangled_name_buffer[512] = { 0 };
-	demangle_name(demangled_name_buffer, sizeof(demangled_name_buffer), (sstring_t("_Z") + proper_name).c_str(), 0);
+	const sstring_t demangled_name = demangle_name((sstring_t("_Z") + proper_name).c_str(), 0);
 
-	if (demangled_name_buffer[0] == '\0')
+	if (demangled_name.empty())
 	{
 		get_class(address)->m_name = name;
 	}
 	else
 	{
-		get_class(address)->m_name = demangled_name_buffer;
+		get_class(address)->m_name = demangled_name;
 	}
 
 	ea_t vtb = BADADDR;
@@ -248,7 +247,7 @@ ea_t gcc_rtti_t::format_type_info(const ea_t address)
 		if (*reinterpret_cast<ea_t *>(&m_code[current - sizeof(ea_t)]) == 0 // following 0
 		 && *reinterpret_cast<ea_t *>(&m_code[current]) == address)
 		{
-			vtb = inf.minEA + current;
+			vtb = inf.min_ea + current;
 		}
 	}
 
@@ -256,11 +255,11 @@ ea_t gcc_rtti_t::format_type_info(const ea_t address)
 	{
 		printf("vtable for %s at " ADDR_FORMAT "\n", proper_name.c_str(), vtb);
 		format_struct(vtb, "pp");
-		do_name_anyway(vtb, (sstring_t("__ZTV") + proper_name).c_str(), 1024);
+		set_name(vtb, (sstring_t("__ZTV") + proper_name).c_str());
 
 		if (m_auxiliary_vtables_names)
 		{
-			do_name_anyway(vtb + sizeof(ea_t), (sstring_t("__ZTV") + proper_name + "_0").c_str(), 1024);
+			set_name(vtb + sizeof(ea_t), (sstring_t("__ZTV") + proper_name + "_0").c_str());
 		}
 	}
 	else
@@ -333,15 +332,16 @@ ea_t gcc_rtti_t::format_struct(ea_t address, const string fmt)
 		}
 		else if (f == 'i')
 		{
-			doDwrd(address, sizeof(int));
+			
+			create_dword(address, sizeof(int));
 			address += sizeof(int);
 		}
 		else if (f == 'l')
 		{
 		#ifdef __EA64__
-			doQwrd(address, sizeof(ea_t));
+			create_qword(address, sizeof(ea_t));
 		#else
-			doDwrd(address, sizeof(ea_t));
+			create_dword(address, sizeof(ea_t));
 		#endif
 			address += sizeof(ea_t);
 		}
@@ -396,12 +396,13 @@ int idaapi gcc_rtti_t::init_s(void)
 	}
 }
 
-void idaapi gcc_rtti_t::run_s(int arg)
+bool idaapi gcc_rtti_t::run_s(size_t arg)
 {
 	if (s_instance)
 	{
 		s_instance->run();
 	}
+	return true;
 }
 
 void idaapi gcc_rtti_t::term_s()

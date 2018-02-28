@@ -36,7 +36,7 @@ public:
 
 public:
 	static  int idaapi init_s(void);
-	static void idaapi run_s(int arg);
+	static bool idaapi run_s(size_t arg);
 	static void idaapi term_s();
 
 private:
