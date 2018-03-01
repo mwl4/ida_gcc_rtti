@@ -62,8 +62,26 @@ void gcc_rtti_t::run()
 	m_current_class_id = 0;
 
 	// initialize code data
-	m_code.resize(static_cast<size_t>(inf.max_ea - inf.min_ea));
-	get_bytes(&m_code[0], m_code.size(), inf.min_ea, GMB_READALL);
+	m_code_begin = get_first_seg()->start_ea;
+	m_code_end = get_last_seg()->end_ea;
+
+	if (m_code_begin == BADADDR || m_code_end == BADADDR)
+	{
+		warning("Code begins/end in inproper place, begin = " ADDR_FORMAT "; end = " ADDR_FORMAT, m_code_begin, m_code_end);
+		return;
+	}
+
+	if (m_code_end - m_code_begin > 100 * 1024 * 1024) // 100 MB limit
+	{
+		warning("Code size exceeds limit of 100 MB (%u MB)", static_cast<uint>((m_code_end - m_code_begin) / 1024 / 1024));
+		return;
+	}
+
+	m_code.resize(static_cast<size_t>(m_code_end - m_code_begin));
+	if (!get_bytes(&m_code[0], m_code.size(), m_code_begin, GMB_READALL))
+	{
+		warning("Getting bytes returned failure, expect problems.. [" ADDR_FORMAT " - " ADDR_FORMAT "]", m_code_begin, m_code_end);
+	}
 
 	const string question = "Do you want to make auxiliary vtables names (+ptr_size offset)?\n";
 	const int answer = ask_buttons("Yes", "No", "Cancel", ASKBTN_NO, question);
@@ -178,9 +196,9 @@ void gcc_rtti_t::handle_classes(ti_types_t idx, ea_t(gcc_rtti_t::*const formatte
 
 		for (size_t current = 0; current < m_code.size(); current += sizeof(ea_t))
 		{
-			if (*reinterpret_cast<ea_t *>(&m_code[current]) == address && !is_code(get_flags(inf.min_ea + current)))
+			if (*reinterpret_cast<ea_t *>(&m_code[current]) == address && !is_code(get_flags(m_code_begin + current)))
 			{
-				xrefs.push_back(utils::xreference_t(inf.min_ea + current, false));
+				xrefs.push_back(utils::xreference_t(m_code_begin + current, false));
 			}
 		}
 
@@ -247,7 +265,7 @@ ea_t gcc_rtti_t::format_type_info(const ea_t address)
 		if (*reinterpret_cast<ea_t *>(&m_code[current - sizeof(ea_t)]) == 0 // following 0
 		 && *reinterpret_cast<ea_t *>(&m_code[current]) == address)
 		{
-			vtb = inf.min_ea + current;
+			vtb = m_code_begin + current;
 		}
 	}
 

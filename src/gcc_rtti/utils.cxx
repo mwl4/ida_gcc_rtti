@@ -49,12 +49,15 @@ namespace utils
 	{
 		xreferences_t found;
 
-		for (ea_t startAddress = inf.min_ea, current = 0;; startAddress = current + sizeof(ea_t))
+		const ea_t min_ea = get_first_seg()->start_ea;
+		const ea_t max_ea = get_last_seg()->end_ea;
+
+		for (ea_t startAddress = min_ea, current = 0;; startAddress = current + sizeof(ea_t))
 		{
 			const ea_t mask = ALL_BYTES_EA_MASK;
 			current = bin_search
 			(
-				startAddress, inf.max_ea,
+				startAddress, max_ea,
 				reinterpret_cast<const uchar *>(&address),
 				reinterpret_cast<const uchar *>(&mask),
 				sizeof(ea_t),

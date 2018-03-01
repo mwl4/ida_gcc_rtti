@@ -77,6 +77,8 @@ public:
 private:
 	utils::strings_data_t	m_strings;
 	array_dyn_t<uchar>		m_code;
+	ea_t					m_code_begin = BADADDR;
+	ea_t					m_code_end = BADADDR;
 	classes_t				m_classes;
 	unique_ptr_t<graph_t>	m_graph;
 	unsigned int			m_current_class_id;
