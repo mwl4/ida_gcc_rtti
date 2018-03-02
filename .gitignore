@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+bin/
+obj/
+src/libs/idasdk

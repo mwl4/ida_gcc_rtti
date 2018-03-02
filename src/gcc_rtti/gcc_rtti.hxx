@@ -46,6 +46,9 @@ public:
 	class class_t;
 	using classes_t = map_t<ea_t, unique_ptr_t<class_t>>;
 
+	class segment_data_t;
+	using segments_data_t = array_dyn_t<segment_data_t>;
+
 private:
 	enum ti_types_t
 	{
@@ -56,6 +59,8 @@ private:
 		TI_COUNT /* always at end */
 	};
 	static const string ti_names[gcc_rtti_t::TI_COUNT];
+
+	void initialize_segments_data();
 
 	ea_t find_string(const string s) const;
 	void find_type_info(const ti_types_t idx);
@@ -76,9 +81,7 @@ public:
 
 private:
 	utils::strings_data_t	m_strings;
-	array_dyn_t<uchar>		m_code;
-	ea_t					m_code_begin = BADADDR;
-	ea_t					m_code_end = BADADDR;
+	segments_data_t			m_segments_data;
 	classes_t				m_classes;
 	unique_ptr_t<graph_t>	m_graph;
 	unsigned int			m_current_class_id;
@@ -122,6 +125,14 @@ public:
 	array_dyn_t<base_t> m_bases;
 	unsigned int		m_id;
 	bool				m_shown = false;
+};
+
+class gcc_rtti_t::segment_data_t
+{
+public:
+	array_dyn_t<uchar>	m_data;
+	ea_t				m_start_ea = BADADDR;
+	ea_t				m_end_ea = BADADDR;
 };
 
 /* eof */

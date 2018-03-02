@@ -7,20 +7,32 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gcc_rtti", "gcc_rtti\gcc_rt
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|IDA32 = Debug|IDA32
-		Debug|IDA64 = Debug|IDA64
-		Release|IDA32 = Release|IDA32
-		Release|IDA64 = Release|IDA64
+		Debug 32|x64 = Debug 32|x64
+		Debug 32|x86 = Debug 32|x86
+		Debug 64|x64 = Debug 64|x64
+		Debug 64|x86 = Debug 64|x86
+		Release 32|x64 = Release 32|x64
+		Release 32|x86 = Release 32|x86
+		Release 64|x64 = Release 64|x64
+		Release 64|x86 = Release 64|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug|IDA32.ActiveCfg = Debug|Win32
-		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug|IDA32.Build.0 = Debug|Win32
-		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug|IDA64.ActiveCfg = Debug|x64
-		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug|IDA64.Build.0 = Debug|x64
-		{1C76E780-917D-45FF-852B-F007D47D4972}.Release|IDA32.ActiveCfg = Release|Win32
-		{1C76E780-917D-45FF-852B-F007D47D4972}.Release|IDA32.Build.0 = Release|Win32
-		{1C76E780-917D-45FF-852B-F007D47D4972}.Release|IDA64.ActiveCfg = Release|x64
-		{1C76E780-917D-45FF-852B-F007D47D4972}.Release|IDA64.Build.0 = Release|x64
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug 32|x64.ActiveCfg = Debug 32|x64
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug 32|x64.Build.0 = Debug 32|x64
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug 32|x86.ActiveCfg = Debug 32|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug 32|x86.Build.0 = Debug 32|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug 64|x64.ActiveCfg = Debug 64|x64
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug 64|x64.Build.0 = Debug 64|x64
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug 64|x86.ActiveCfg = Debug 64|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Debug 64|x86.Build.0 = Debug 64|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Release 32|x64.ActiveCfg = Release 32|x64
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Release 32|x64.Build.0 = Release 32|x64
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Release 32|x86.ActiveCfg = Release 32|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Release 32|x86.Build.0 = Release 32|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Release 64|x64.ActiveCfg = Release 64|x64
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Release 64|x64.Build.0 = Release 64|x64
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Release 64|x86.ActiveCfg = Release 64|Win32
+		{1C76E780-917D-45FF-852B-F007D47D4972}.Release 64|x86.Build.0 = Release 64|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -52,12 +52,12 @@ namespace utils
 		const ea_t min_ea = get_first_seg()->start_ea;
 		const ea_t max_ea = get_last_seg()->end_ea;
 
-		for (ea_t startAddress = min_ea, current = 0;; startAddress = current + sizeof(ea_t))
+		for (ea_t start_address = min_ea, current = 0;; start_address = current + sizeof(ea_t))
 		{
 			const ea_t mask = ALL_BYTES_EA_MASK;
 			current = bin_search
 			(
-				startAddress, max_ea,
+				start_address, max_ea,
 				reinterpret_cast<const uchar *>(&address),
 				reinterpret_cast<const uchar *>(&mask),
 				sizeof(ea_t),
@@ -65,7 +65,10 @@ namespace utils
 			);
 			if (current != BADADDR)
 			{
-				found.push_back(xreference_t(current, is_code(get_flags(current))));
+				if (get_segment_name(current) != "LOAD")
+				{
+					found.push_back(xreference_t(current, is_code(get_flags(current))));
+				}
 			}
 			else
 			{

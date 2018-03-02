@@ -40,7 +40,7 @@ bool gcc_rtti_t::init()
 
 void gcc_rtti_t::destroy()
 {
-	m_code.clear();
+	m_segments_data.clear();
 	m_strings.clear();
 	m_graph.reset();
 }
@@ -61,27 +61,7 @@ void gcc_rtti_t::run()
 	m_classes.clear();
 	m_current_class_id = 0;
 
-	// initialize code data
-	m_code_begin = get_first_seg()->start_ea;
-	m_code_end = get_last_seg()->end_ea;
-
-	if (m_code_begin == BADADDR || m_code_end == BADADDR)
-	{
-		warning("Code begins/end in inproper place, begin = " ADDR_FORMAT "; end = " ADDR_FORMAT, m_code_begin, m_code_end);
-		return;
-	}
-
-	if (m_code_end - m_code_begin > 100 * 1024 * 1024) // 100 MB limit
-	{
-		warning("Code size exceeds limit of 100 MB (%u MB)", static_cast<uint>((m_code_end - m_code_begin) / 1024 / 1024));
-		return;
-	}
-
-	m_code.resize(static_cast<size_t>(m_code_end - m_code_begin));
-	if (!get_bytes(&m_code[0], m_code.size(), m_code_begin, GMB_READALL))
-	{
-		warning("Getting bytes returned failure, expect problems.. [" ADDR_FORMAT " - " ADDR_FORMAT "]", m_code_begin, m_code_end);
-	}
+	initialize_segments_data();
 
 	const string question = "Do you want to make auxiliary vtables names (+ptr_size offset)?\n";
 	const int answer = ask_buttons("Yes", "No", "Cancel", ASKBTN_NO, question);
@@ -110,14 +90,69 @@ void gcc_rtti_t::run()
 	printf("Looking for multiple-inheritance classes\n");
 	handle_classes(TI_VMICTINFO, &gcc_rtti_t::format_vmi_type_info);
 
+	info("Success, found %u classes.", static_cast<uint>(m_classes.size()));
+
 	// destroy console which was created
 	utils::operating_system_t::destroy_console();
-
-	info("Success, found %u classes.", static_cast<uint>(m_classes.size()));
 
 	// create graph
 	m_graph = std::make_unique<graph_t>();
 	m_graph->run();
+}
+
+void gcc_rtti_t::initialize_segments_data()
+{
+	m_segments_data.clear();
+
+	for (int segment_id = 0; segment_id < get_segm_qty(); ++segment_id)
+	{
+		segment_t *const segment = getnseg(segment_id);
+		if (!segment)
+		{
+			continue;
+		}
+
+		qstring segment_name;
+		get_segm_name(&segment_name, segment);
+
+		qstring segment_class;
+		get_segm_class(&segment_class, segment);
+
+		if (segment_class != "DATA" && segment_class != "CONST")
+		{
+			continue;
+		}
+
+		segment_data_t segcode;
+		segcode.m_start_ea = segment->start_ea;
+		segcode.m_end_ea = segment->end_ea;
+
+		if (segment->start_ea == BADADDR || segment->end_ea == BADADDR)
+		{
+			warning("Code begins/end in inproper place, begin = " ADDR_FORMAT "; end = " ADDR_FORMAT, segment->start_ea, segment->end_ea);
+			continue;
+		}
+
+		if ((segment->end_ea - segment->start_ea) > 100 * 1024 * 1024) // 100 MB limit
+		{
+			warning
+			(
+				"Segment (%s) data size exceeds limit of 100 MB (%u MB) [ " ADDR_FORMAT " - " ADDR_FORMAT " ]",
+				segment_name.c_str(),
+				static_cast<uint>((segment->end_ea - segment->start_ea) / 1024 / 1024),
+				segcode.m_start_ea, segcode.m_end_ea
+			);
+			continue;
+		}
+
+		segcode.m_data.resize(static_cast<size_t>(segcode.m_end_ea - segcode.m_start_ea));
+		if (!get_bytes(&segcode.m_data[0], segcode.m_data.size(), segcode.m_start_ea, GMB_READALL))
+		{
+			warning("get_bytes() returned failure, expect problems.. [" ADDR_FORMAT " - " ADDR_FORMAT "]", segcode.m_start_ea, segcode.m_end_ea);
+		}
+
+		m_segments_data.push_back(segcode);
+	}
 }
 
 ea_t gcc_rtti_t::find_string(const string s) const
@@ -194,11 +229,17 @@ void gcc_rtti_t::handle_classes(ti_types_t idx, ea_t(gcc_rtti_t::*const formatte
 		}
 		address += sizeof(ea_t) * 1; // in original python code there was (* 2), but it seems to be incorrect.. I am confused
 
-		for (size_t current = 0; current < m_code.size(); current += sizeof(ea_t))
+		for (const segment_data_t &segment_data : m_segments_data)
 		{
-			if (*reinterpret_cast<ea_t *>(&m_code[current]) == address && !is_code(get_flags(m_code_begin + current)))
+			for (size_t current = 0; current < segment_data.m_data.size(); current += sizeof(ea_t))
 			{
-				xrefs.push_back(utils::xreference_t(m_code_begin + current, false));
+				if (*reinterpret_cast<const ea_t *>(&segment_data.m_data[current]) != address
+				 || is_code(get_flags(segment_data.m_start_ea + current)))
+				{
+					continue;
+				}
+
+				xrefs.push_back(utils::xreference_t(segment_data.m_start_ea + current, false));
 			}
 		}
 
@@ -242,8 +283,8 @@ ea_t gcc_rtti_t::format_type_info(const ea_t address)
 
 	// looks good, let's do it
 	const ea_t address2 = format_struct(address, "vp");
-	set_name(tis, (sstring_t("__ZTS") + proper_name).c_str());
-	set_name(address, (sstring_t("__ZTI") + proper_name).c_str());
+	set_name(tis, (sstring_t("__ZTS") + proper_name).c_str(), SN_NOWARN);
+	set_name(address, (sstring_t("__ZTI") + proper_name).c_str(), SN_NOWARN);
 
 	const sstring_t demangled_name = demangle_name((sstring_t("_Z") + proper_name).c_str(), 0);
 
@@ -260,12 +301,17 @@ ea_t gcc_rtti_t::format_type_info(const ea_t address)
 
 	// find our vtable
 	// 0 followed by ea
-	for (size_t current = sizeof(ea_t); current < m_code.size(); current += sizeof(ea_t))
+	for (const segment_data_t &segment_data : m_segments_data)
 	{
-		if (*reinterpret_cast<ea_t *>(&m_code[current - sizeof(ea_t)]) == 0 // following 0
-		 && *reinterpret_cast<ea_t *>(&m_code[current]) == address)
+		for (size_t current = sizeof(ea_t); current < segment_data.m_data.size(); current += sizeof(ea_t))
 		{
-			vtb = m_code_begin + current;
+			if (*reinterpret_cast<const ea_t *>(&segment_data.m_data[current - sizeof(ea_t)]) != 0 // following 0
+			 || *reinterpret_cast<const ea_t *>(&segment_data.m_data[current]) != address)
+			{
+				continue;
+			}
+
+			vtb = segment_data.m_start_ea + current;
 		}
 	}
 
@@ -273,11 +319,11 @@ ea_t gcc_rtti_t::format_type_info(const ea_t address)
 	{
 		printf("vtable for %s at " ADDR_FORMAT "\n", proper_name.c_str(), vtb);
 		format_struct(vtb, "pp");
-		set_name(vtb, (sstring_t("__ZTV") + proper_name).c_str());
+		set_name(vtb, (sstring_t("__ZTV") + proper_name).c_str(), SN_NOWARN);
 
 		if (m_auxiliary_vtables_names)
 		{
-			set_name(vtb + sizeof(ea_t), (sstring_t("__ZTV") + proper_name + "_0").c_str());
+			set_name(vtb + sizeof(ea_t), (sstring_t("__ZTV") + proper_name + "_0").c_str(), SN_NOWARN);
 		}
 	}
 	else
@@ -309,7 +355,7 @@ ea_t gcc_rtti_t::format_vmi_type_info(const ea_t address)
 	const uint32_t base_count = get_32bit(addr - sizeof(uint32_t));
 	if (base_count > 100)
 	{
-		printf(ADDR_FORMAT ": over 100 base classes (%u)(" ADDR_FORMAT ")?!", address, base_count, addr - sizeof(uint32_t));
+		printf(ADDR_FORMAT ": over 100 base classes (%u)(" ADDR_FORMAT ")?!", address, base_count, static_cast<ea_t>(addr - sizeof(uint32_t)));
 		return BADADDR;
 	}
 
