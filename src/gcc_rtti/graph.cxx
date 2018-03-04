@@ -14,8 +14,6 @@
 
 #include "graph.hxx"
 
-#include "gcc_rtti.hxx"
-
 void graph_t::run()
 {
 	const string question = "Do you want to generate graph?\n";
@@ -111,16 +109,21 @@ void graph_t::process_ignored_prefixes()
 		}
 
 		class_pair.second->m_shown = true;
+		make_class_bases_visible(class_pair.second.get());
+	}
+}
 
-		for (const gcc_rtti_t::class_t::base_t &base : class_pair.second->m_bases)
+void graph_t::make_class_bases_visible(gcc_rtti_t::class_t *const c)
+{
+	for (const gcc_rtti_t::class_t::base_t &base : c->m_bases)
+	{
+		if (!base.m_class)
 		{
-			if (!base.m_class)
-			{
-				continue;
-			}
-
-			base.m_class->m_shown = true;
+			continue;
 		}
+
+		base.m_class->m_shown = true;
+		make_class_bases_visible(base.m_class);
 	}
 }
 
@@ -145,7 +148,8 @@ bool graph_t::save_to_file(const string filepath)
 			continue;
 		}
 
-		qfprintf(file, " a%u [shape=box, label = \"%s\", color=\"blue\"]\n", class_pair.second->m_id, class_pair.second->m_name.c_str());
+		qfprintf(file, " a%u [shape=box, label = \"%s\", color=\"blue\", tooltip=\"" ADDR_FORMAT "\"]\n",
+				 class_pair.second->m_id, class_pair.second->m_name.c_str(), class_pair.first);
 	}
 
 	for (const auto &class_pair : classes)

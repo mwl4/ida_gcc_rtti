@@ -71,7 +71,7 @@ namespace utils
 
 	static inline bool is_bad_addr(const ea_t address)
 	{
-		return address == 0 || address == BADADDR || is_spec_ea(address) || !is_loaded(address);
+		return address == 0 || address == BADADDR /*|| is_spec_ea(address) || !is_loaded(address)*/;
 	}
 
 	sstring_t ea_to_bytes(const ea_t address);

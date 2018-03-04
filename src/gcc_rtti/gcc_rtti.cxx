@@ -25,7 +25,6 @@ const string gcc_rtti_t::ti_names[gcc_rtti_t::TI_COUNT] = {
 
 gcc_rtti_t::gcc_rtti_t()
 	: m_current_class_id(0)
-	, m_auxiliary_vtables_names(false)
 {
 }
 
@@ -62,13 +61,6 @@ void gcc_rtti_t::run()
 	m_current_class_id = 0;
 
 	initialize_segments_data();
-
-	const string question = "Do you want to make auxiliary vtables names (+ptr_size offset)?\n";
-	const int answer = ask_buttons("Yes", "No", "Cancel", ASKBTN_NO, question);
-
-	if (answer == ASKBTN_CANCEL) { return; }
-
-	m_auxiliary_vtables_names = (answer == ASKBTN_YES) ? true : false;
 
 	// there is no way to get stdout/in from IDA application,
 	// so we must create system console and use cstdlib stdout/in instead
@@ -198,12 +190,16 @@ void gcc_rtti_t::find_type_info(const ti_types_t idx)
 void gcc_rtti_t::handle_classes(ti_types_t idx, ea_t(gcc_rtti_t::*const formatter)(const ea_t address))
 {
 	sstring_t name = vtname(ti_names[idx]);
-	ea_t address = get_name_ea(BADADDR, name.c_str());
-	if (address == BADADDR)
+
+	// try single underscore first
+	ea_t address = get_name_ea(BADADDR, &name[1]);
+	if (address != BADADDR)
 	{
-		// try single underscore
-		name = &name[1]; // skipping first character
-		address = get_name_ea(BADADDR, name.c_str());
+		name = &name[1];
+	}
+	else
+	{
+		address = get_name_ea(BADADDR, &name[0]);
 	}
 
 	if (address == BADADDR)
@@ -227,14 +223,30 @@ void gcc_rtti_t::handle_classes(ti_types_t idx, ea_t(gcc_rtti_t::*const formatte
 		{
 			xrefs = utils::xref_or_find(address, true);
 		}
-		address += sizeof(ea_t) * 1; // in original python code there was (* 2), but it seems to be incorrect.. I am confused
+
+		address += sizeof(ea_t) * 2; // We are looking for +8(32)/+16(64) offset to type vtable
 
 		for (const segment_data_t &segment_data : m_segments_data)
 		{
-			for (size_t current = 0; current < segment_data.m_data.size(); current += sizeof(ea_t))
+			for (size_t current = 0; current < segment_data.m_data.size() - sizeof(ea_t); current += sizeof(ea_t))
 			{
 				if (*reinterpret_cast<const ea_t *>(&segment_data.m_data[current]) != address
 				 || is_code(get_flags(segment_data.m_start_ea + current)))
+				{
+					continue;
+				}
+
+				const ea_t next_ea = *reinterpret_cast<const ea_t *>(&segment_data.m_data[current + sizeof(ea_t)]);
+
+				if (is_code(get_flags(next_ea)))
+				{
+					continue;
+				}
+
+				sstring_t mangled_name = utils::get_string(next_ea);
+				if (mangled_name[0] == '\0' || mangled_name[0] == -1) { continue; }
+				if (mangled_name[0] == '*') { mangled_name = &mangled_name[1]; }
+				if (detect_compiler_using_demangler((sstring_t("_ZTV") + mangled_name).c_str()) <= 0)
 				{
 					continue;
 				}
@@ -273,10 +285,11 @@ ea_t gcc_rtti_t::format_type_info(const ea_t address)
 	}
 
 	const sstring_t name = utils::get_string(tis);
+
 	if (name.empty())
 	{
 		return BADADDR;
-	}
+	}	
 
 	/* skip '*' character in case of type defined in function */
 	const sstring_t proper_name = (name[0] == '*' ? name.c_str() + 1 : name.c_str());
@@ -286,15 +299,14 @@ ea_t gcc_rtti_t::format_type_info(const ea_t address)
 	set_name(tis, (sstring_t("__ZTS") + proper_name).c_str(), SN_NOWARN);
 	set_name(address, (sstring_t("__ZTI") + proper_name).c_str(), SN_NOWARN);
 
-	const sstring_t demangled_name = demangle_name((sstring_t("_Z") + proper_name).c_str(), 0);
-
-	if (demangled_name.empty())
+	qstring demangled_name;
+	if(demangle_name(&demangled_name, (sstring_t("_Z") + proper_name).c_str(), 0) >= 0)
 	{
-		get_class(address)->m_name = name;
+		get_class(address)->m_name = demangled_name;
 	}
 	else
 	{
-		get_class(address)->m_name = demangled_name;
+		get_class(address)->m_name = name;
 	}
 
 	ea_t vtb = BADADDR;
@@ -320,11 +332,6 @@ ea_t gcc_rtti_t::format_type_info(const ea_t address)
 		printf("vtable for %s at " ADDR_FORMAT "\n", proper_name.c_str(), vtb);
 		format_struct(vtb, "pp");
 		set_name(vtb, (sstring_t("__ZTV") + proper_name).c_str(), SN_NOWARN);
-
-		if (m_auxiliary_vtables_names)
-		{
-			set_name(vtb + sizeof(ea_t), (sstring_t("__ZTV") + proper_name + "_0").c_str(), SN_NOWARN);
-		}
 	}
 	else
 	{
@@ -336,6 +343,10 @@ ea_t gcc_rtti_t::format_type_info(const ea_t address)
 
 ea_t gcc_rtti_t::format_si_type_info(const ea_t address)
 {
+	// dd `vtable for'__cxxabiv1::__si_class_type_info+8
+	// dd `typeinfo name for'MyClass
+	// dd `typeinfo for'BaseClass
+
 	const ea_t addr = format_type_info(address);
 	const ea_t pbase = utils::get_ea(addr);
 	get_class(address)->add_base(class_t::base_t(get_class(pbase)));
@@ -344,6 +355,12 @@ ea_t gcc_rtti_t::format_si_type_info(const ea_t address)
 
 ea_t gcc_rtti_t::format_vmi_type_info(const ea_t address)
 {
+	// dd `vtable for'__cxxabiv1::__si_class_type_info+8
+	// dd `typeinfo name for'MyClass
+	// dd flags
+	// dd base_count
+	// (base_type, offset_flags) x base_count
+
 	ea_t addr = format_type_info(address);
 	if (addr == BADADDR)
 	{
@@ -355,7 +372,7 @@ ea_t gcc_rtti_t::format_vmi_type_info(const ea_t address)
 	const uint32_t base_count = get_32bit(addr - sizeof(uint32_t));
 	if (base_count > 100)
 	{
-		printf(ADDR_FORMAT ": over 100 base classes (%u)(" ADDR_FORMAT ")?!", address, base_count, static_cast<ea_t>(addr - sizeof(uint32_t)));
+		printf(ADDR_FORMAT ": over 100 base classes (%u)(" ADDR_FORMAT ")?!\n", address, base_count, static_cast<ea_t>(addr - sizeof(uint32_t)));
 		return BADADDR;
 	}
 

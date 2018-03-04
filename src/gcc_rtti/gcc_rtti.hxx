@@ -85,7 +85,6 @@ private:
 	classes_t				m_classes;
 	unique_ptr_t<graph_t>	m_graph;
 	unsigned int			m_current_class_id;
-	bool					m_auxiliary_vtables_names;
 };
 
 class gcc_rtti_t::class_t

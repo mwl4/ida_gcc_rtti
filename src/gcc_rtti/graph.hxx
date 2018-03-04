@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "gcc_rtti.hxx"
+
 class graph_t
 {
 public:
@@ -20,6 +22,7 @@ public:
 private:
 	bool fill_ignored_prefixes();
 	void process_ignored_prefixes();
+	void make_class_bases_visible(gcc_rtti_t::class_t *const c);
 	bool save_to_file(const string filepath);
 
 private:

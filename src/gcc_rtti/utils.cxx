@@ -124,7 +124,14 @@ namespace utils
 		}
 
 		sstring_t result;
-		for (uchar c = 0; (c = get_byte(address + result.length())); result.append(static_cast<char>(c)));
+		for (uchar c = 0; (c = get_byte(address + result.length()));)
+		{
+			if (result.length() < 1000) // limit reached
+			{
+				result.append(static_cast<char>(c));
+			}
+			else break;
+		}
 		return result;
 	}
 
