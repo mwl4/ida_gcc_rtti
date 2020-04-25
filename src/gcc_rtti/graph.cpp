@@ -10,9 +10,9 @@
  *
  ***************************************************************************************************************/
 
-#include <stdinc.hxx>
+#include "stdinc.hpp"
 
-#include "graph.hxx"
+#include "graph.hpp"
 
 void graph_t::run()
 {
@@ -31,7 +31,7 @@ void graph_t::run()
 
 	process_ignored_prefixes();
 
-	const string filepath = ask_file(true, "", "*.dot", "Choose file to which save the graph...");
+	const string filepath = ask_file(true, "*.dot", "Choose file to which we will save the graph...");
 
 	if (!filepath)
 	{

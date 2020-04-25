@@ -10,11 +10,11 @@
  *
  ***************************************************************************************************************/
 
-#include <stdinc.hxx>
+#include "stdinc.hpp"
 
-#include "gcc_rtti.hxx"
+#include "gcc_rtti.hpp"
 
-#include "graph.hxx"
+#include "graph.hpp"
 
 const string gcc_rtti_t::ti_names[gcc_rtti_t::TI_COUNT] = {
 	"St9type_info",
@@ -477,7 +477,7 @@ int idaapi gcc_rtti_t::init_s(void)
 	}
 }
 
-bool idaapi gcc_rtti_t::run_s(size_t arg)
+bool idaapi gcc_rtti_t::run_s(size_t)
 {
 	if (s_instance)
 	{

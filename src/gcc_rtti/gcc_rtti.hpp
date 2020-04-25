@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <utils.hxx>
+#include "utils.hpp"
 
 /* forward declarations */
 class graph_t;

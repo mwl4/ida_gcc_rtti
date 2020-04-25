@@ -10,14 +10,14 @@
  *
  ***************************************************************************************************************/
 
-#include <stdinc.hxx>
+#include "stdinc.hpp"
 
-#include <gcc_rtti.hxx>
+#include "gcc_rtti.hpp"
 
 plugin_t PLUGIN =
 {
 	IDP_INTERFACE_VERSION,			// version
-	NULL,							// flags
+	0,								// flags
 	&gcc_rtti_t::init_s,			// initialize
 	&gcc_rtti_t::term_s,			// destroy
 	&gcc_rtti_t::run_s,				// invoke plugin
