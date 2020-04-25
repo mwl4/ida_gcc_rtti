@@ -35,16 +35,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="gcc_rtti.hxx" />
-    <ClInclude Include="graph.hxx" />
-    <ClInclude Include="stdinc.hxx" />
-    <ClInclude Include="utils.hxx" />
+    <ClInclude Include="gcc_rtti.hpp" />
+    <ClInclude Include="graph.hpp" />
+    <ClInclude Include="stdinc.hpp" />
+    <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="gcc_rtti.cxx" />
-    <ClCompile Include="graph.cxx" />
-    <ClCompile Include="plugin.cxx" />
-    <ClCompile Include="stdinc.cxx">
+    <ClCompile Include="gcc_rtti.cpp" />
+    <ClCompile Include="graph.cpp" />
+    <ClCompile Include="plugin.cpp" />
+    <ClCompile Include="stdinc.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug 64|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug 32|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug 64|x64'">Create</PrecompiledHeader>
@@ -54,7 +54,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release 64|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release 32|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="utils.cxx" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1C76E780-917D-45FF-852B-F007D47D4972}</ProjectGuid>
@@ -204,7 +204,7 @@
       <AdditionalIncludeDirectories>.\;.\..\libs\idasdk\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4267;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeaderFile>stdinc.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>stdinc.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -222,7 +222,7 @@
       <AdditionalIncludeDirectories>.\;.\..\libs\idasdk\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4267;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeaderFile>stdinc.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>stdinc.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -242,7 +242,7 @@
       <AdditionalIncludeDirectories>.\;.\..\libs\idasdk\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4267;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeaderFile>stdinc.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>stdinc.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -262,7 +262,7 @@
       <AdditionalIncludeDirectories>.\;.\..\libs\idasdk\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4267;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeaderFile>stdinc.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>stdinc.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -284,7 +284,7 @@
       <AdditionalIncludeDirectories>.\;.\..\libs\idasdk\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4267;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>stdinc.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>stdinc.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -306,7 +306,7 @@
       <AdditionalIncludeDirectories>.\;.\..\libs\idasdk\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4267;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>stdinc.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>stdinc.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -332,7 +332,7 @@
       <AdditionalIncludeDirectories>.\;.\..\libs\idasdk\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4267;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>stdinc.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>stdinc.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -358,7 +358,7 @@
       <AdditionalIncludeDirectories>.\;.\..\libs\idasdk\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4267;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>stdinc.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>stdinc.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

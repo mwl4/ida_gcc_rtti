@@ -15,33 +15,33 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="utils.hxx">
+    <ClInclude Include="utils.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="gcc_rtti.hxx">
+    <ClInclude Include="gcc_rtti.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="stdinc.hxx">
+    <ClInclude Include="stdinc.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="graph.hxx">
+    <ClInclude Include="graph.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="utils.cxx">
+    <ClCompile Include="utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="plugin.cxx">
+    <ClCompile Include="plugin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gcc_rtti.cxx">
+    <ClCompile Include="gcc_rtti.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stdinc.cxx">
+    <ClCompile Include="stdinc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graph.cxx">
+    <ClCompile Include="graph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
