@@ -10,9 +10,9 @@
  *
  ***************************************************************************************************************/
 
-#include <stdinc.hxx>
+#include "stdinc.hpp"
 
-#include "utils.hxx"
+#include "utils.hpp"
 
 #ifdef _WIN32
 #include <Windows.h> // for AllocConsole, FreeConsole

@@ -10,9 +10,9 @@
  *
  ***************************************************************************************************************/
 
-#include <stdinc.hxx>
+#include "stdinc.hpp"
 
-#include <gcc_rtti.hxx>
+#include "gcc_rtti.hpp"
 
 plugin_t PLUGIN =
 {

@@ -10,11 +10,11 @@
  *
  ***************************************************************************************************************/
 
-#include <stdinc.hxx>
+#include "stdinc.hpp"
 
-#include "gcc_rtti.hxx"
+#include "gcc_rtti.hpp"
 
-#include "graph.hxx"
+#include "graph.hpp"
 
 const string gcc_rtti_t::ti_names[gcc_rtti_t::TI_COUNT] = {
 	"St9type_info",

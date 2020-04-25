@@ -10,9 +10,9 @@
  *
  ***************************************************************************************************************/
 
-#include <stdinc.hxx>
+#include "stdinc.hpp"
 
-#include "graph.hxx"
+#include "graph.hpp"
 
 void graph_t::run()
 {

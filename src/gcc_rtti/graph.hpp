@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "gcc_rtti.hxx"
+#include "gcc_rtti.hpp"
 
 class graph_t
 {
