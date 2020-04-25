@@ -55,13 +55,13 @@ namespace utils
 		for (ea_t start_address = min_ea, current = 0;; start_address = current + sizeof(ea_t))
 		{
 			const ea_t mask = ALL_BYTES_EA_MASK;
-			current = bin_search
+			current = bin_search2
 			(
 				start_address, max_ea,
 				reinterpret_cast<const uchar *>(&address),
 				reinterpret_cast<const uchar *>(&mask),
 				sizeof(ea_t),
-				BIN_SEARCH_FORWARD, BIN_SEARCH_CASE
+				BIN_SEARCH_FORWARD | BIN_SEARCH_CASE
 			);
 			if (current != BADADDR)
 			{
@@ -140,7 +140,7 @@ namespace utils
 		sstring_t result;
 		for (int i = 0; i < sizeof(address); ++i)
 		{
-			result.cat_sprnt("%02X", ((address >> (i * 8)) & 0xff));
+			result.cat_sprnt("%02X", (unsigned char)((address >> (i * 8)) & 0xff));
 			if (i + 1 != sizeof(address)) { result += ' '; }
 		}
 		return result;

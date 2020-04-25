@@ -477,7 +477,7 @@ int idaapi gcc_rtti_t::init_s(void)
 	}
 }
 
-bool idaapi gcc_rtti_t::run_s(size_t arg)
+bool idaapi gcc_rtti_t::run_s(size_t)
 {
 	if (s_instance)
 	{
